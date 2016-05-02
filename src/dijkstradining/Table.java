@@ -41,8 +41,8 @@ public class Table {
 			Fork rightFork = forks.get((forkCount + 1) % names.length);
 			//
 			philosophers.add(new Philosopher(name, leftFork, rightFork));
-			System.out.println(name + ", left fork:" + leftFork.getForkID()
-					+ ", right fork:" + rightFork.getForkID());
+			System.out.println(name + ", left fork:" + leftFork.getForkPriority()
+					+ ", right fork:" + rightFork.getForkPriority());
 
 			forkCount++;
 		}

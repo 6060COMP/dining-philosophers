@@ -1,5 +1,7 @@
 package dijkstradining;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Fork - This class represents a fork used in the "Dining Philosophers" problem.
  * Its #use method is Thread Safe - that is, check and set is treated as a mutually exclusive
@@ -7,18 +9,16 @@ package dijkstradining;
  * @author Dr. David Lamb, based on Dijkstra's "Dining Philosophers" problem
  */
 public class Fork {
-	static int globalForkID = 0;
+	static AtomicInteger globalForkID = new AtomicInteger();
 	
 	/**
 	 * Constructs a new fork, with a unique ID.
-	 * This constructor is NOT thread safe
 	 */
 	public Fork() {
-		forkID = globalForkID;
-		globalForkID++;
+		forkPriority = globalForkID.incrementAndGet();
 	}
 	
-	private int forkID = 0;
+	private int forkPriority;
 	
 	/**
 	 * The philosopher presently holding the fork
@@ -53,8 +53,8 @@ public class Fork {
 	 * Gets the numeric ID of the current fork
 	 * @return the ID
 	 */
-	public int getForkID() {
-		return forkID;
+	public int getForkPriority() {
+		return forkPriority;
 	}
 
 	/**

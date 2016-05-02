@@ -12,7 +12,7 @@ import dijkstradining.Fork.ForkInUseException;
  * @author Dr. David Lamb, based on Dijkstra's "Dining Philosophers" problem
  */
 public class Philosopher extends Thread { // implements Runnable {
-	public Fork leftFork, rightFork;
+	public Fork firstFork, secondFork;
 	public String name;
 	public boolean atTable = true;
 	public int timesEaten = 0;
@@ -31,8 +31,13 @@ public class Philosopher extends Thread { // implements Runnable {
 	 */
 	public Philosopher(String name, Fork left, Fork right) {
 		this.name = name;
-		this.leftFork = left;
-		this.rightFork = right;
+		if (right.getForkPriority() < left.getForkPriority()) {
+			this.firstFork = right;
+			this.secondFork = left;
+		} else {
+			this.firstFork = left;
+			this.secondFork = right;
+		}
 		setName(name);
 	}
 	
@@ -54,10 +59,10 @@ public class Philosopher extends Thread { // implements Runnable {
 		while (atTable) {
 			think(); // dum de dum de dum
 
-			// now ensure I've got my left fork
-			synchronized (leftFork) {
-				// then my right fork
-				synchronized (rightFork) {
+			// now ensure I've got my first fork
+			synchronized (firstFork) {
+				// then my second fork
+				synchronized (secondFork) {
 					// yum yum yum!
 					eat();
 				}
@@ -91,8 +96,8 @@ public class Philosopher extends Thread { // implements Runnable {
 	 */
 	public void eat() {
 		try {
-			leftFork.use(this);
-			rightFork.use(this);
+			firstFork.use(this);
+			secondFork.use(this);
 
 			timesEaten++;
 
@@ -102,15 +107,15 @@ public class Philosopher extends Thread { // implements Runnable {
 				System.err.println(ie.getMessage()); // ignore
 			}
 
-			rightFork.finish(this);
-			leftFork.finish(this);
+			secondFork.finish(this);
+			firstFork.finish(this);
 
 		} catch (ForkInUseException e) {
 			// this is to ensure you don't try to cheat
 			// you must have the fork taken (with a lock)
 			// before you try to eat
 			Fork fork = e.fork;
-			System.err.println("Fork " + fork.getForkID()
+			System.err.println("Fork " + fork.getForkPriority()
 					+ " already in use by " + fork.getBeingUsedBy().name);
 		}
 	}
